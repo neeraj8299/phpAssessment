@@ -2,58 +2,45 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Event\StoreRequest;
+use App\Http\Requests\Event\UpdateRequest;
 use App\Models\Event;
+use App\Services\EventService;
 use App\Traits\ApiResponse;
-use Illuminate\Http\Request;
 
 class EventController extends Controller
 {
     use ApiResponse;
 
-    public function index()
+    public function __construct(protected EventService $eventService)
     {
-        return Event::paginate(10); // Supports bonus: pagination
     }
 
-    public function store(Request $request)
+    public function index()
     {
-        $validated = $request->validate([
-            'name' => 'required|string',
-            'description' => 'nullable|string',
-            'country' => 'required|string',
-            'capacity' => 'required|integer|min:1',
-            'start_time' => 'required|date',
-            'end_time' => 'required|date|after:start_time',
-        ]);
+        return $this->eventService->listEvents();
+    }
 
-        $event = Event::create($validated);
+    public function store(StoreRequest $request)
+    {
+        $event = $this->eventService->createEvent($request->validated());
         return $this->success($event, 'Event created successfully.');
     }
 
     public function show(Event $event)
     {
-        return $event;
+        return $this->eventService->getEvent($event);
     }
 
-    public function update(Request $request, Event $event)
+    public function update(UpdateRequest $request, Event $event)
     {
-        $validated = $request->validate([
-            'name' => 'sometimes|required|string',
-            'description' => 'nullable|string',
-            'country' => 'sometimes|required|string',
-            'capacity' => 'sometimes|required|integer|min:1',
-            'start_time' => 'sometimes|required|date',
-            'end_time' => 'sometimes|required|date|after:start_time',
-        ]);
-
-        $event->update($validated);
+        $event = $this->eventService->updateEvent($event, $request->validated());
         return $this->success($event, 'Event updated successfully.');
     }
 
     public function destroy(Event $event)
     {
-        $event->delete();
+        $this->eventService->deleteEvent($event);
         return $this->success($event, 'Event deleted successfully.');
     }
 }
-

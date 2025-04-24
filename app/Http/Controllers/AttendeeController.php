@@ -3,50 +3,41 @@
 namespace App\Http\Controllers;
 
 use App\Models\Attendee;
+use App\Services\AttendeeService;
 use App\Traits\ApiResponse;
-use Illuminate\Http\Request;
+use App\Http\Requests\StoreAttendeeRequest;
+use App\Http\Requests\UpdateAttendeeRequest;
 
 class AttendeeController extends Controller
 {
     use ApiResponse;
 
-    public function index()
+    public function __construct(protected AttendeeService $attendeeService)
     {
-        return $this->success(Attendee::all());
     }
 
-    public function store(Request $request)
+    public function index()
     {
-        $validated = $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|email|unique:attendees,email',
-            'phone' => 'nullable|string',
-        ]);
+        return $this->success($this->attendeeService->all());
+    }
 
-        return $this->success(Attendee::create($validated));
+    public function store(StoreAttendeeRequest $request)
+    {
+        return $this->success($this->attendeeService->store($request->validated()));
     }
 
     public function show(Attendee $attendee)
     {
-        return $this->success($attendee);
+        return $this->success($this->attendeeService->show($attendee));
     }
 
-    public function update(Request $request, Attendee $attendee)
+    public function update(UpdateAttendeeRequest $request, Attendee $attendee)
     {
-        $validated = $request->validate([
-            'name' => 'sometimes|required|string',
-            'email' => 'sometimes|required|email|unique:attendees,email,' . $attendee->id,
-            'phone' => 'nullable|string',
-        ]);
-
-        $attendee->update($validated);
-        return $this->success($attendee, "Details Updated Successfully");
+        return $this->success($this->attendeeService->update($request->validated(), $attendee), "Details Updated Successfully");
     }
 
     public function destroy(Attendee $attendee)
     {
-        $attendee->delete();
-        return $this->success($attendee, 'Attendee deleted');
+        return $this->success($this->attendeeService->destroy($attendee), 'Attendee deleted');
     }
 }
-

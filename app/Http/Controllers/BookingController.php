@@ -2,45 +2,31 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Booking;
-use App\Models\Event;
 use App\Traits\ApiResponse;
-use Illuminate\Http\Request;
+use App\Services\BookingService;
+use App\Http\Requests\StoreBookingRequest;
 
 class BookingController extends Controller
 {
     use ApiResponse;
 
+    public function __construct(protected BookingService $bookingService)
+    {
+        //
+    }
+
     public function index()
     {
-        return $this->success(Booking::with(['event', 'attendee'])->get());
+        return $this->success($this->bookingService->getAllBookings());
     }
 
-    public function store(Request $request)
+    public function store(StoreBookingRequest $request)
     {
-        $validated = $request->validate([
-            'event_id' => 'required|exists:events,id',
-            'attendee_id' => 'required|exists:attendees,id',
-        ]);
-
-        $event = Event::find($validated['event_id']);
-
-        if (Booking::where('event_id', $validated['event_id'])->where('attendee_id', $validated['attendee_id'])->exists()) {
-            return $this->error('Attendee already booked for this event', [], 409);
+        try {
+            $booking = $this->bookingService->create($request->validated());
+            return $this->success($booking, 'Booking successful');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return $this->error($e->getMessage(), $e->errors(), 422);
         }
-
-        $bookedCount = Booking::where('event_id', $validated['event_id'])->count();
-        if ($bookedCount >= $event->capacity) {
-            return $this->error('Event capacity full', [], 403);
-        }
-
-        $booking = Booking::create([
-            'event_id' => $validated['event_id'],
-            'attendee_id' => $validated['attendee_id'],
-            'booked_at' => now(),
-        ]);
-
-        return $this->success($booking, 'Booking successful');
     }
 }
-
