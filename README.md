@@ -1,51 +1,60 @@
-
-# Event Booking API
+# 🎟️ Event Booking API
 
 ## Overview
 
-This is a Laravel-based RESTful API designed to manage events, attendees, and bookings. The API supports various operations such as creating and managing events, handling attendee registrations, and booking tickets for events. The system is built using Laravel Sail, a light-weight command-line interface for Docker, to ensure easy setup and deployment.
+This is a Laravel 12-based RESTful API designed for managing events, attendees, and bookings. It allows users to create and manage events, register attendees, and handle ticket bookings. The application uses **Laravel Sail** (Docker-based environment) to simplify setup and deployment.
 
-### Features:
-- Manage events (create, update, delete).
-- Add and update attendees for events.
-- Handle bookings for events with details like number of tickets, attendees, and payment information.
-- RESTful API endpoints with JSON responses.
+---
 
-## Technologies
+## ✨ Features
 
-- Laravel (PHP framework)
-- MySQL
-- Docker (Containerization via Laravel Sail)
-- PHP 8.2
+- ✅ Create, update, and delete events  
+- ✅ Register attendees for events  
+- ✅ Book event tickets (includes attendee and payment info)  
+- ✅ RESTful API with clean JSON responses  
+- ✅ Built-in automated testing (PHPUnit)  
 
-## Getting Started
+---
 
-### Prerequisites
+## 🧰 Technologies
 
-Before you begin, ensure you have the following installed on your system:
+- Laravel 12 (PHP Framework)  
+- PHP 8.2  
+- MySQL  
+- Docker (Laravel Sail)  
+- PHPUnit for Testing
 
-- Docker
-- Docker Compose
-- Node.js and NPM (for front-end tasks, if applicable)
+---
 
-### Installation
+## 🚀 Getting Started
 
-Clone the repository:
+### 🔧 Prerequisites
+
+Ensure you have the following installed:
+
+- [Docker](https://docs.docker.com/get-docker/)
+- [Docker Compose](https://docs.docker.com/compose/)
+- (Optional) Node.js and NPM (if you're planning to add front-end tasks)
+
+---
+
+## 📦 Installation & Setup
+
+### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/event-booking-api.git
-cd event-booking-api
+git clone https://github.com/neeraj8299/phpAssessment.git
+cd phpAssessment
 ```
 
-#### Setting up the environment
-
-1. Copy the `.env.example` file to `.env`:
+### 2. Copy the environment file
 
 ```bash
 cp .env.example .env
 ```
 
-2. Install Composer dependencies inside a Docker container (if `vendor/` doesn't exist):
+### 3. Start Laravel Sail
+> If you haven't installed dependencies yet, do this first:
 
 ```bash
 docker run --rm \
@@ -56,30 +65,61 @@ docker run --rm \
   composer install
 ```
 
-#### Starting the Laravel Sail environment
-
-Once the dependencies are installed, start the development containers:
-
 ```bash
 ./vendor/bin/sail up -d
 ```
 
-> If you're running Sail for the first time or made changes to your Docker setup, you can build the containers:
+> If you’re running Sail for the first time or after changes:
 
 ```bash
-./vendor/bin/sail up --build
+./vendor/bin/sail up --build -d
 ```
 
-### Database Setup
+---
 
-Once the containers are up and running, run the migrations to set up the database:
+### 4. Generate application key
+
+```bash
+./vendor/bin/sail artisan key:generate
+```
+
+---
+
+### 5. Run database migrations
 
 ```bash
 ./vendor/bin/sail artisan migrate
 ```
 
-### Testing the API
+---
 
-You can test the API using Postman. Import the collection from the following link:
+## 🥪 Running Tests
 
-- [Event Booking API Collection (Postman)](https://elements.getpostman.com/redirect?entityId=32389459-75ebb38d-178a-4cd4-b837-cb0b15babeba&entityType=collection)
+Run all the automated test cases using PHPUnit inside Sail:
+
+```bash
+./vendor/bin/sail test
+```
+
+> Or use the artisan test command (Laravel 8+):
+
+```bash
+./vendor/bin/sail artisan test
+```
+
+---
+
+## 🥪 API Testing with Postman
+You can test the endpoints using Postman. Import the collection:
+
+👉 [Event Booking API Collection (Postman)](https://elements.getpostman.com/redirect?entityId=32389459-75ebb38d-178a-4cd4-b837-cb0b15babeba&entityType=collection)
+
+---
+
+## 🛠 Troubleshooting
+
+- Make sure Docker containers are running:  
+  `docker ps`
+- If migrations fail, check your `.env` database credentials and rebuild containers.
+- To stop Sail:  
+  `./vendor/bin/sail down`
